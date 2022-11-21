@@ -23,7 +23,7 @@
       <h1>Welcome, {{ state.username }}</h1>
     </header>
 
-    <section class="check-box">
+    <section class="chat-box">
       <div
         v-for="message in state.messages"
         :key="message.key"
@@ -34,10 +34,10 @@
         "
       >
         <div class="message-inner">
-          <div class="username">
+          <div class="message-inner username">
             {{ message.username }}
           </div>
-          <div class="content">
+          <div class="message-inner content">
             {{ message.content }}
           </div>
         </div>
@@ -74,6 +74,7 @@ export default {
       const messagesRef = db.ref("messages");
 
       messagesRef.on("value", (snapshot) => {
+        console.log(snapshot);
         const data = snapshot.val();
         let messages = [];
 
@@ -99,7 +100,7 @@ export default {
     const SendMessage = () => {
       const messagesRef = db.ref("messages");
 
-      if (inputMessage.value !== "" || inputMessage.value !== null) {
+      if (inputMessage.value === "" || inputMessage.value === null) {
         return;
       }
 
