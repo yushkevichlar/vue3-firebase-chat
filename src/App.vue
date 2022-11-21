@@ -98,7 +98,7 @@ export default {
     };
 
     const Logout = () => {
-      state.username = [];
+      state.username = "";
     };
 
     const SendMessage = () => {
@@ -137,6 +137,9 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+button {
+  cursor: pointer;
 }
 .view {
   display: flex;
@@ -191,6 +194,7 @@ export default {
           }
         }
         input[type="submit"] {
+          cursor: pointer;
           appearance: none;
           border: none;
           outline: none;
@@ -319,6 +323,7 @@ export default {
         }
 
         input[type="submit"] {
+          cursor: pointer;
           appearance: none;
           border: none;
           outline: none;
