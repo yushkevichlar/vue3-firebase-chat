@@ -1,18 +1,16 @@
 <template>
   <div
     class="view login"
-    v-if="state.username === '' || state.username === null"
-  >
+    v-if="state.username === '' || state.username === null">
     <form class="login-form" @submit.prevent="Login">
       <div class="form-inner">
         <h1>Login to FireChat</h1>
-        <label for="username">Username</label>
+        <!-- <label for="username">Username</label>
         <input
           type="text"
           placeholder="Please enter your username..."
-          v-model="inputUsername"
-        />
-        <input type="submit" value="Login" />
+          v-model="inputUsername" /> -->
+        <input type="submit" value="Sign in with Google" />
       </div>
     </form>
   </div>
@@ -31,8 +29,7 @@
           message.username === state.username
             ? 'message current-user'
             : 'message'
-        "
-      >
+        ">
         <div class="message-inner">
           <div class="message-inner username">
             {{ message.username }}
@@ -49,8 +46,7 @@
         <input
           type="text"
           placeholder="Write a message..."
-          v-model="inputMessage"
-        />
+          v-model="inputMessage" />
         <input type="submit" value="Send" />
       </form>
     </footer>
@@ -59,7 +55,8 @@
 
 <script>
 import { reactive, onMounted, ref } from "vue";
-import db from "./db";
+import { auth, provider, db } from "./db";
+import { signInWithPopup } from "firebase/auth";
 
 export default {
   setup() {
@@ -71,10 +68,13 @@ export default {
     });
 
     onMounted(() => {
+      if (localStorage.getItem("username")) {
+        state.username = localStorage.getItem("username");
+      }
+
       const messagesRef = db.ref("messages");
 
       messagesRef.on("value", (snapshot) => {
-        console.log(snapshot);
         const data = snapshot.val();
         let messages = [];
 
@@ -91,14 +91,27 @@ export default {
     });
 
     const Login = () => {
-      if (inputUsername.value !== "" || inputUsername.value !== null) {
-        state.username = inputUsername.value;
-        inputUsername.value = "";
-      }
+      // if (inputUsername.value !== "" || inputUsername.value !== null) {
+      //   state.username = inputUsername.value;
+      //   localStorage.setItem("username", state.username);
+      //   inputUsername.value = "";
+      // }
+
+      signInWithPopup(auth, provider).then((data) => {
+        console.log(data);
+        if (data.user && data.user.displayName) {
+          state.username = data.user.displayName;
+          localStorage.setItem("username", data.user.displayName);
+          inputUsername.value = "";
+        }
+
+        return;
+      });
     };
 
     const Logout = () => {
       state.username = "";
+      localStorage.removeItem("username");
     };
 
     const SendMessage = () => {
@@ -152,6 +165,7 @@ button {
     .login-form {
       display: block;
       width: 100%;
+      max-width: 25rem;
       padding: 15px;
 
       .form-inner {
@@ -164,6 +178,7 @@ button {
           color: #4e48eb;
           font-size: 28px;
           margin-bottom: 30px;
+          text-align: center;
         }
         label {
           display: block;
@@ -338,12 +353,6 @@ button {
         }
       }
     }
-  }
-}
-
-@media screen and (min-width: 991px) {
-  .login-form {
-    width: 50% !important;
   }
 }
 </style>
